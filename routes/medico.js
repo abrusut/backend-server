@@ -11,37 +11,37 @@ var middlewareAutenticacion = require('../middlewares/autenticacion');
 // Inicializar variables
 var app = express();
 
-// Recuperar Modelo de Usuario
-var Usuario = require('../models/usuario');
+// Recuperar Modelo de Medico
+var Medico = require('../models/medico');
 
 // ========================================
-//  OBTENER TODOS LOS USUARIOS
+//  OBTENER TODOS LOS MEDICOS
 // ========================================
 app.get('/', (req, res, next) => {
 
     var desde = req.query.desde || 0;
     desde = Number(desde);
 
-    //Paginado
-    Usuario.find({}, 'nombre email img role')
+    Medico.find({})
         .skip(desde)
         .limit(5)
+        .populate('usuario' , 'nombre email') //Agrega el objeto usuario al response
+        .populate('hospital') //Agrega el objeto hospital al response
         .exec(
-            ( err, usuarios ) =>{
+            ( err, medicos ) =>{
                 if ( err ) {
                     return res.status(500).json({
                         ok: false,
-                        mensaje: 'Error Cargando usuarios',
+                        mensaje: 'Error Cargando Medico',
                         errors: err
                     });
                 }
 
-
-                Usuario.count({}, (err , conteo )=> {
+                Medico.count({}, (err , conteo )=> {
                     res.status(200).json({
                         ok: true,
-                        usuarios: usuarios,
-                        desde: req.query.desde,
+                        medicos: medicos,
+                        desde: desde,
                         total: conteo
                     });
                 });
@@ -49,36 +49,39 @@ app.get('/', (req, res, next) => {
 });
 
 // ========================================
-//  ACTUALIZAR USUARIO
+//  ACTUALIZAR MEDICO
 // ========================================
 app.put('/:id', middlewareAutenticacion.verificarToken, (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
 
-    Usuario.findById( id , (err , usuario) => {
+    Medico.findById( id , (err , medico) => {
         if ( err ) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error buscando usuario',
+                mensaje: 'Error buscando medico',
                 errors: err
             });
         }
 
-        if( !usuario ){
+        if( !medico ){
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe usuario con id '+ id,
-                errors: {message: 'No existe usuario con ese ID ' }
+                mensaje: 'No existe medico con id '+ id,
+                errors: {message: 'No existe medico con ese ID ' }
             });
         }
 
 
-        usuario.nombre = body.nombre;
-        usuario.email = body.email;
-        usuario.role = body.role;
+        medico.nombre = body.nombre;
+        medico.usuario = req.usuario._id;
 
-        usuario.save( ( err, usuarioActualizado ) => {
+        if( body.idHospital ){
+            medico.hospital = body.idHospital;
+        }
+
+        medico.save( ( err, medicoActualizado ) => {
             if ( err ) {
                 return res.status(400).json({
                     ok: false,
@@ -87,11 +90,9 @@ app.put('/:id', middlewareAutenticacion.verificarToken, (req, res) => {
                 });
             }
 
-            usuarioActualizado.password = ':)';
-
             res.status(200).json({
                 ok: true,
-                usuario: usuarioActualizado
+                medico: medicoActualizado
             });
         });
 
@@ -100,32 +101,30 @@ app.put('/:id', middlewareAutenticacion.verificarToken, (req, res) => {
 });
 
 // ========================================
-//  GUARDAR USUARIO
+//  GUARDAR MEDICO
 // ========================================
 app.post('/',middlewareAutenticacion.verificarToken, (req, res) => {
 
     var body = req.body;
 
-    var usuario = new Usuario({
+    var medico = new Medico({
         nombre: body.nombre,
-        email: body.email,
-        password: bcrypt.hashSync(body.password, 10),
-        img: body.img,
-        role: body.role
+        usuario: req.usuario._id,
+        hospital: body.idHospital
     });
 
-    usuario.save( ( err, usuarioPersistido ) => {
+    medico.save( ( err, medicoPersistido ) => {
         if ( err ) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Error Guardando usuario',
+                mensaje: 'Error Guardando medico',
                 errors: err
             });
         }
 
         res.status(201).json({
             ok: true,
-            usuario: usuarioPersistido,
+            medico: medicoPersistido,
             usuariotoken: req.usuario //usuario que hizo la peticion
         });
     });
@@ -133,32 +132,32 @@ app.post('/',middlewareAutenticacion.verificarToken, (req, res) => {
 });
 
 // ========================================
-//  BORRAR USUARIO
+//  BORRAR MEDICO
 // ========================================
 
 app.delete('/:id', middlewareAutenticacion.verificarToken, ( req, res ) => {
    var id = req.params.id;
 
-    Usuario.findByIdAndRemove(id, ( err , usuarioBorrado ) => {
+    Medico.findByIdAndRemove(id, ( err , medicoBorrado ) => {
         if ( err ) {
             return res.status(500).json({
                 ok: false,
-                mensaje: 'Error al borrar usuario',
+                mensaje: 'Error al borrar medico',
                 errors: err
             });
         }
 
-        if( !usuarioBorrado ){
+        if( !medicoBorrado ){
             return res.status(400).json({
                 ok: false,
-                mensaje: 'No existe usuario con id '+ id,
-                errors: {message: 'No existe usuario con ese ID ' }
+                mensaje: 'No existe medico con id '+ id,
+                errors: {message: 'No existe medico con ese ID ' }
             });
         }
 
         res.status(200).json({
             ok: true,
-            usuario: usuarioBorrado
+            medico: medicoBorrado
         });
     });
 

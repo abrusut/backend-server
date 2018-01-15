@@ -1,7 +1,7 @@
 // Requires
 var express = require('express'); //Server Node Express
 var mongoose = require('mongoose'); // Para hacer Conexion a la db con mongoose
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser'); // Para recuperar los parametros de las llamadas del front
 
 // Inicializar variables
 var app = express();
@@ -11,9 +11,22 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
+
+// Server index config
+var serveIndex = require('serve-index');
+app.use(express.static(__dirname + '/'))
+app.use('/uploads', serveIndex(__dirname + '/uploads'));
+
+
+
 // Importar Rutas
 var appRoutes = require('./routes/app');
 var usuarioRoutes = require('./routes/usuario');
+var medicoRoutes = require('./routes/medico');
+var hospitalRoutes = require('./routes/hospital');
+var busquedaRoutes = require('./routes/busqueda');
+var uploadRoutes = require('./routes/upload');
+var imagenesRoutes = require('./routes/imagenes');
 var loginRoutes = require('./routes/login');
 
 // Conexion a la base mongo
@@ -26,6 +39,11 @@ mongoose.connection.openUri('mongodb://localhost:27017/hospitaldb',
 
 
 // Rutas
+app.use('/imagenes',imagenesRoutes);
+app.use('/upload',uploadRoutes);
+app.use('/busqueda',busquedaRoutes);
+app.use('/hospital',hospitalRoutes);
+app.use('/medico',medicoRoutes);
 app.use('/usuario',usuarioRoutes);
 app.use('/login',loginRoutes);
 app.use('/',appRoutes);
