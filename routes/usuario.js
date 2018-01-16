@@ -102,7 +102,7 @@ app.put('/:id', middlewareAutenticacion.verificarToken, (req, res) => {
 // ========================================
 //  GUARDAR USUARIO
 // ========================================
-app.post('/',middlewareAutenticacion.verificarToken, (req, res) => {
+app.post('/', (req, res) => {
 
     var body = req.body;
 
