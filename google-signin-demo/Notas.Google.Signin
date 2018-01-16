@@ -1,0 +1,20 @@
+## Crear proyecto en google developer
+https://developers.google.com/identity/sign-in/web/sign-in
+
+(AdminPro-GoogleSignin)
+
+## Configurar origenes permitidos
+Orígenes de JavaScript autorizados
+
+http://localhost:3000 (backend node.js)
+http://localhost:4200 (front end angular)
+
+## Iniciar proyecto node
+npm init
+
+## Instalar lite-server
+npm install lite-server --save-dev
+
+## Levantar
+npm run dev
+
