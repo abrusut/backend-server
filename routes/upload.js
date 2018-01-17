@@ -116,27 +116,32 @@ function subirPorTipo( colleccion, id, nombreArchivo, res)
                try {
                    fs.unlinkSync(pathViejo);
                } catch (err) {
-                   return res.status(500).json({
+                  /** return res.status(500).json({
                        ok: false,
                        mensaje: 'Error borrando Imagen de usuario',
                        errors:err,
                        pathViejo:pathViejo
                    });
+                   **/
                }
 
            }
 
-           //Actualizo la imagen en el usuario
-           usuario.img = nombreArchivo;
-           usuario.save( (err, usuarioActualizado ) => {
-               return res.status(200).json({
-                   ok: true,
-                   mensaje: 'Imagen de usuario actualizada',
-                   usuario:usuarioActualizado,
-                   pathViejo:pathViejo
-                });
+           try{
+               //Actualizo la imagen en el usuario
+               usuario.img = nombreArchivo;
+               usuario.save( (err, usuarioActualizado ) => {
+                   return res.status(200).json({
+                       ok: true,
+                       mensaje: 'Imagen de usuario actualizada',
+                       usuario:usuarioActualizado,
+                       pathViejo:pathViejo
+                    });
 
-           });
+               });
+           } catch (err) {
+               console.error(err);
+           }
 
         });
     }

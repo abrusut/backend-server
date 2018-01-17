@@ -16,7 +16,7 @@ app.get('/:tipo/:img', (req, res, next) => {
 
     // Tipos de entidades validas
     var colleccionesValidas = ['hospitales','medicos','usuarios'];
-    if(colleccionesValidas.indexOf(colleccion) < 0)
+    if(colleccionesValidas.indexOf(tipo) < 0)
     {
         res.status(400).json({
             ok: false,
