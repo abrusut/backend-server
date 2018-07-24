@@ -51,7 +51,7 @@ app.get('/', (req, res, next) => {
 // ========================================
 //  ACTUALIZAR USUARIO
 // ========================================
-app.put('/:id', middlewareAutenticacion.verificarToken, (req, res) => {
+app.put('/:id', [ middlewareAutenticacion.verificarToken,middlewareAutenticacion.verificarAdminOMismoUsuario ], (req, res) => {
 
     var id = req.params.id;
     var body = req.body;
@@ -136,7 +136,7 @@ app.post('/', (req, res) => {
 //  BORRAR USUARIO
 // ========================================
 
-app.delete('/:id', middlewareAutenticacion.verificarToken, ( req, res ) => {
+app.delete('/:id', [ middlewareAutenticacion.verificarToken,middlewareAutenticacion.verificarAdminOMismoUsuario ], ( req, res ) => {
    var id = req.params.id;
 
     Usuario.findByIdAndRemove(id, ( err , usuarioBorrado ) => {

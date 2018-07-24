@@ -65,7 +65,7 @@ app.put('/:colleccion/:id', function(req, res) {
     var extension = nombreSplit[nombreSplit.length -1 ];
 
     // Validar extensiones
-    var extensionesValidas = [ 'jpg','gif', ' png', 'jpeg' ];
+    var extensionesValidas = [ 'jpg','gif', 'png', 'jpeg' ];
     if( extensionesValidas.indexOf(extension) < 0 ) //No encontro esa extension
     {
         res.status(400).json({

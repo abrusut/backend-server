@@ -49,6 +49,41 @@ app.get('/', (req, res, next) => {
 });
 
 // ========================================
+//  OBTENER 1 Medico TODOS LOS MEDICOS
+// ========================================
+app.get('/:id', (req, res) => {
+
+    var id = req.params.id;
+
+    Medico.findById( id )
+        .populate('usuario' , 'nombre email') //Agrega el objeto usuario al response
+        .populate('hospital') //Agrega el objeto hospital al response
+        .exec(( err, medico ) =>{
+        if ( err ) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error buscando medico',
+                errors: err
+            });
+        }
+
+        if( !medico ){
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'No existe medico con id '+ id,
+                errors: {message: 'No existe medico con ese ID ' }
+            });
+        }
+
+         res.status(200).json({
+             ok: true,
+             medico: medico
+         });
+
+    });
+});
+
+// ========================================
 //  ACTUALIZAR MEDICO
 // ========================================
 app.put('/:id', middlewareAutenticacion.verificarToken, (req, res) => {
@@ -78,7 +113,7 @@ app.put('/:id', middlewareAutenticacion.verificarToken, (req, res) => {
         medico.usuario = req.usuario._id;
 
         if( body.idHospital ){
-            medico.hospital = body.idHospital;
+            medico.hospital = body.hospital;
         }
 
         medico.save( ( err, medicoActualizado ) => {
@@ -110,7 +145,7 @@ app.post('/',middlewareAutenticacion.verificarToken, (req, res) => {
     var medico = new Medico({
         nombre: body.nombre,
         usuario: req.usuario._id,
-        hospital: body.idHospital
+        hospital: body.hospital
     });
 
     medico.save( ( err, medicoPersistido ) => {
